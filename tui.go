@@ -31,11 +31,39 @@ tags = ["", "", ""]
 categories = ["Tutorial"]
 +++
 
-### Summary goes here
+Want to equip your terminal application with a nice visual user interface? Three TUI libraries got into a (small) contest to show their abilities.
 
 <!--more-->
 
-## Intro goes here
+Console applications usually take some parameters at start, and maybe some more input through basic console I/O. And that's ok in most cases, though sometimes it would be great to have a visual user interface but without the size and complexity of a full-blown Web app.
+
+[Text-Based User Interface](https://en.wikipedia.org/wiki/Text-based_user_interface) (or TUI) libraries meet this need. They bring panes, input, output, sometimes also mouse support, graphics, and audio, to your terminal.
+
+This post evaluates three TUI libraries for Go. A small sample application with a few basic UI requirements gets implemented with each of these libraries. Then we can see, by comparing the code side-by-side, how each library works - how easy each step is, and how much code is required.
+
+
+## The selection process
+
+To get selected for the test, the libraries had to meet some basic requirements:
+
+* They should be in a halfway stable state (that is, no "alpha" or "experimental" warning tags attached)
+* They should not be abandoned (or look like being abandoned)
+* They should provide a decent feature set (that is, they should not specialize on one specific functionality, like, for example, colored output or progress bars)
+* They should have a reasonably good documentation or at least good demo code (as I don't like doing a trial-and-error style development based on reading just some API docs and trying to figure out how all these API functions work together)
+
+Based on this I searched [GitHub](https://github.com), [LibHunt](https://go.libhunt.com), and [GolangLibs](https://golanglibs.com), checked through the [Awesome Go](https://awesome-go.com) list, and also did a sanity check via Google search.
+
+The result consists of three projects that exist for quite some time and should be quite known by now (as far as I can tell):
+
+* `nsf/termbox-go`
+* `jroimartin/gocui` (based on termbox-go)
+* `gdamore/tcell`
+
+
+## The test application
+
+
+
 
 ## The code
 */
