@@ -161,11 +161,11 @@ func runTermui() {
 
 func layout(g *gocui.Gui) error {
 	width, height := g.Size()
-	view, err := g.SetView("main", 4, 4, width-4, height-4)
+	_, err := g.SetView("main", 4, 4, width-4, height-4)
 	return err
 }
 
-func quit(g *gocui.Gui) error {
+func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
 
@@ -185,23 +185,24 @@ func runGocui() {
 		return
 	}
 
-	err := g.MainLoop()
+	err = g.MainLoop()
 	fmt.Println("Main loop has finished: ", err)
 }
 
 func main() {
-	if len(os.Args) == 0 {
+	if len(os.Args) <= 1 {
 		fmt.Println("Usage: go run tui.go [termui|gocui]")
+		return
 	}
-	if os.Args == "termui" {
+	if os.Args[1] == "termui" {
 		runTermui()
 		return
 	}
-	if os.Args == "gocui" {
+	if os.Args[1] == "gocui" {
 		runGocui()
 		return
 	}
-	fmt.Println("No such option:", os.Args)
+	fmt.Println("No such option:", os.Args[0])
 }
 
 /*
@@ -210,15 +211,16 @@ func main() {
 Step 1: `go get` the code. Note the `-d` flag that prevents auto-installing
 the binary into `$GOPATH/bin`.
 
-    go get -d github.com/appliedgo/TODO:
+    go get -d github.com/appliedgo/tui
 
 Step 2: `cd` to the source code directory.
 
-    cd $GOPATH/src/github.com/appliedgo/TODO:
+    cd $GOPATH/src/github.com/appliedgo/tui
 
 Step 3. Run the binary.
 
-    go run TODO:.go
+    go run tui.go termui
+    go run tui.go gocui
 
 
 ## Odds and ends
