@@ -57,7 +57,17 @@ Turned out that none of the libraries passed all requirements.
 
 ## So that's it? No single all-in-one, high-level GUI lib with decent documentation?
 
-Well, not if you really want all those nifty UI features at once. However, if you can forego some of the requirements, there is indeed a small selection of capable TUI libraries at your disposal.
+Well, not if you really want all those nifty UI features at once. However, if you can forego some of the requirements, there is indeed a small selection of capable TUI libraries at your disposal that I'll briefly introduce below.
+
+Just one thing before we start.
+
+The list is (and cannot) be complete. I used GitHub.com, awesome-go.com, GolangLibs.com, and LibHunt.com to find TUI libraries but still there is no guarantee that I found all relevant projects out there.
+
+Without the tips of a couple of redditors in [this `/r/golang` thread](https://www.reddit.com/r/golang/comments/5zx4xb/suggest_me_your_favourite_terminal_gui_libs/), `clui` and `wm` would perhaps have slipped through.
+
+And then, of course, the above list of criteria is a very fuzzy filter, and you might have included a library that I ruled out because of this list.
+
+But now let's move on to the TUI library overview.
 
 
 ### Bare bone TUI libraries
@@ -70,6 +80,7 @@ If you are fine with building your UI on top of a handful of UI primitives, ther
 `termbox` has a small and straightforward [API](https://godoc.org/github.com/nsf/termbox-go). It uses a two-dimensional cell buffer to represent the terminal screen, with a few methods like setting cells, clearing the screen, or setting the cursor. All input, whether keyboard, mouse, or resize events, is tracked through a unified Event type.
 As simple as the API might seem, it has not prevented others from creating interesting projects on top of `termbox`, including high-level TUI libraries (`termui`, `gocui`, and `termloop``), simple games, [godit](https://github.com/nsf/godit) (a text editor) and [hecate](https://github.com/evanmiller/hecate) (a hex editor), and more.
 
+
 #### [gdamore/tcell](https://github.com/gdamore/tcell)
 
 According to the author, `tcell` was born out of the need for certain features that `termbox-go` does not provide, and patching `termbox-go` turned out to not be a suitable way to go forward. `tcell` claims to have a couple of advantages over `termbox-go`, including [added functionality](https://godoc.org/github.com/gdamore/tcell), better portability, better support for mouse, Unicode, colors, and more. (I cannot comment on these claims, as I have tested neither `termbox` nor `tcell` in great depth.)
@@ -77,7 +88,9 @@ Tcell is the TUI library behind the [Micro editor](https://github.com/zyedidia/m
 
 I should note here that both libraries require `cgo`.
 
+
 ### Higher-level libraries
+
 
 #### [gizak/termui](https://github.com/gizak/termui)
 
@@ -107,11 +120,13 @@ From the screenshots, this is perhaps the best-looking TUI library in this list.
 
 ![clui screencast](clui.gif)
 
+
 #### [wm](https://github.com/cznic/wm)
 
 Definitely a work in progress, `wm` manages overlapping, resizable windows with scrollable content.
 
 ![wm screenshot](tk.png)
+
 
 #### [termloop](https://github.com/JoelOtter/termloop)
 
