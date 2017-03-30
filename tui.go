@@ -158,8 +158,8 @@ This is maybe an edge case. `termloop` is a very specialized TUI - it is a game 
 
 As always, there is some code included to try out at your end. This time, the code uses the two libraries "termui" and "gocui" for creating a minimal UI with a simple layout:
 
-* A list box with a fixed width at the left side
-* A text entry box with a fixed height at the bottom
+* A list box with a fixed width, positioned at the left side
+* A text entry box with a fixed height, positioned at the bottom
 * A general-purpose output pane in the remaining area
 
 If the libary provides a text entry widget, text entered there shall appear in the output pane.
@@ -205,7 +205,11 @@ var listItems = []string{
 
 Let's start with `termui`.
 
-`termui` organizes its content as "blocks". Blocks can be positioned using absolute coordinates, or they can be integrated into a 12-column grid layout. The grid layout allows to dynamically adjust the contents when the user resizes the terminal window.
+`termui` organizes its content as "blocks". Blocks can be positioned using absolute coordinates, or they can be integrated into a 12-column grid layout. The grid layout allows to dynamically adjust the content's width when the user resizes the terminal window.
+
+Right now, there is no automatic height adjustment available, but an [issue](https://github.com/gizak/termui/issues/134) has been raised to request this feature.
+
+The test code works around this restriction by manually re-calculating the heights of the list block and the output block before re-aligning and re-rendering the UI.
 
 */
 
@@ -216,7 +220,7 @@ func runTermui() {
 	if err != nil {
 		log.Fatalln("Cannot initialize termui")
 	}
-	// termui needs some cleanup when terminating.
+	// `termui` needs some cleanup when terminating.
 	defer t.Close()
 
 	// Get the height of the terminal.
@@ -232,7 +236,7 @@ func runTermui() {
 	lb.Items = listItems
 
 	// The input block. termui has no edit box yet, but at the time of
-	// this writing, there is an open pull request for adding
+	// this writing, there is an open [pull request](https://github.com/gizak/termui/pull/129) for adding
 	// a text input widget.
 	ib := t.NewPar("")
 	ib.Height = ih
@@ -241,7 +245,7 @@ func runTermui() {
 	ib.BorderFg = t.ColorYellow
 	ib.TextFgColor = t.ColorWhite
 
-	// The Output block
+	// The Output block.
 	ob := t.NewPar("\nPress Ctrl-C to quit")
 	ob.Height = th - ih
 	ob.BorderLabel = "Output"
@@ -253,7 +257,10 @@ func runTermui() {
 	// but no position. A grid layout puts everything into place.
 	// t.Body is a pre-defined grid. We add one row that contains
 	// two columns.
+	//
 	// The grid uses a 12-column system, so we have to give a "span"
+	// parameter to each column that specifies how many grid column
+	// each column occupies.
 	t.Body.AddRows(
 		t.NewRow(
 			t.NewCol(3, 0, lb),
@@ -266,12 +273,16 @@ func runTermui() {
 	// When the window resizes, the grid must adopt to the new size.
 	// We use a hander func for this.
 	t.Handle("/sys/wnd/resize", func(t.Event) {
-		ob.Text = fmt.Sprintf("Adjusting to %d, %d", t.TermWidth(), t.TermHeight())
+		// Update the heights of list box and output box.
+		lb.Height = t.TermHeight()
+		ob.Height = t.TermHeight() - ih
 		t.Body.Width = t.TermWidth()
 		t.Body.Align()
-		t.Clear()
 		t.Render(t.Body)
 	})
+
+	//
+
 	// We need a way out. Ctrl-C shall stop the event loop.
 	t.Handle("/sys/kbd/C-c", func(t.Event) {
 		t.StopLoop()
@@ -328,6 +339,8 @@ func runGocui() {
 
 	// First, create the list view.
 	lv, err := g.SetView("list", 0, 0, lw, th-1)
+	// ErrUnknownView is not a real error condition.
+	// It just says that the view did not exist before and needs initialization.
 	if err != nil && err != c.ErrUnknownView {
 		log.Println("Failed to create main view:", err)
 		return
