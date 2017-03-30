@@ -177,8 +177,10 @@ import (
 	"log"
 	"os"
 
-	ui "github.com/gizak/termui"
-	"github.com/jroimartin/gocui"
+	// Both TUI packages are abbreviated to avoid making the code
+	// overly verbose.
+	t "github.com/gizak/termui"
+	c "github.com/jroimartin/gocui"
 	"github.com/pkg/errors"
 )
 
@@ -210,70 +212,73 @@ Let's start with `termui`.
 //
 func runTermui() {
 	// Initialize termui.
-	err := ui.Init()
+	err := t.Init()
 	if err != nil {
 		log.Fatalln("Cannot initialize termui")
 	}
 	// termui needs some cleanup when terminating.
-	defer ui.Close()
+	defer t.Close()
 
 	// Get the height of the terminal.
-	th := ui.TermHeight()
+	th := t.TermHeight()
 
 	// The list block
-	lb := ui.NewList()
+	lb := t.NewList()
 	lb.Height = th
 	lb.BorderLabel = "List"
-	lb.BorderLabelFg = ui.ColorGreen
-	lb.BorderFg = ui.ColorGreen
-	lb.ItemFgColor = ui.ColorWhite
+	lb.BorderLabelFg = t.ColorGreen
+	lb.BorderFg = t.ColorGreen
+	lb.ItemFgColor = t.ColorWhite
 	lb.Items = listItems
 
 	// The input block. termui has no edit box yet, but at the time of
 	// this writing, there is an open pull request for adding
 	// a text input widget.
-	ib := ui.NewPar("")
+	ib := t.NewPar("")
 	ib.Height = ih
 	ib.BorderLabel = "Input"
-	ib.BorderLabelFg = ui.ColorYellow
-	ib.BorderFg = ui.ColorYellow
-	ib.TextFgColor = ui.ColorWhite
+	ib.BorderLabelFg = t.ColorYellow
+	ib.BorderFg = t.ColorYellow
+	ib.TextFgColor = t.ColorWhite
 
 	// The Output block
-	ob := ui.NewPar("\nPress Ctrl-C to quit")
+	ob := t.NewPar("\nPress Ctrl-C to quit")
 	ob.Height = th - ih
 	ob.BorderLabel = "Output"
-	ob.BorderLabelFg = ui.ColorCyan
-	ob.BorderFg = ui.ColorCyan
-	ob.TextFgColor = ui.ColorWhite
+	ob.BorderLabelFg = t.ColorCyan
+	ob.BorderFg = t.ColorCyan
+	ob.TextFgColor = t.ColorWhite
 
 	// Now we need to create the layout. The blocks have gotten a size
 	// but no position. A grid layout puts everything into place.
-	// ui.Body is a pre-defined grid. We add one row that contains
+	// t.Body is a pre-defined grid. We add one row that contains
 	// two columns.
 	// The grid uses a 12-column system, so we have to give a "span"
-	ui.Body.AddRows(
-		ui.NewRow(
-			ui.NewCol(3, 0, lb),
-			ui.NewCol(9, 0, ob, ib)))
+	t.Body.AddRows(
+		t.NewRow(
+			t.NewCol(3, 0, lb),
+			t.NewCol(9, 0, ob, ib)))
 
 	// Render the grid.
-	ui.Body.Align()
-	ui.Render(ui.Body)
+	t.Body.Align()
+	t.Render(t.Body)
 
 	// When the window resizes, the grid must adopt to the new size.
 	// We use a hander func for this.
-	ui.Handle("/sys/wnd/resize", func(ui.Event) {
-		ui.Body.Align()
-		ui.Render(ui.Body)
+	t.Handle("/sys/wnd/resize", func(t.Event) {
+		ob.Text = fmt.Sprintf("Adjusting to %d, %d", t.TermWidth(), t.TermHeight())
+		t.Body.Width = t.TermWidth()
+		t.Body.Align()
+		t.Clear()
+		t.Render(t.Body)
 	})
 	// We need a way out. Ctrl-C shall stop the event loop.
-	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
-		ui.StopLoop()
+	t.Handle("/sys/kbd/C-c", func(t.Event) {
+		t.StopLoop()
 	})
 
 	// start the event loop.
-	ui.Loop()
+	t.Loop()
 }
 
 /*
@@ -289,7 +294,7 @@ Now let's see how `gocui` solves the same task.
 // Set up the widgets and run the event loop.
 func runGocui() {
 	// Create a new GUI.
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	g, err := c.NewGui(c.OutputNormal)
 	if err != nil {
 		log.Println("Failed to create a GUI:", err)
 		return
@@ -310,7 +315,7 @@ func runGocui() {
 
 	// Bind the `quit` handler function (also defined further down) to Ctrl-C,
 	// so that we can leave the application at any time.
-	err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit)
+	err = g.SetKeybinding("", c.KeyCtrlC, c.ModNone, quit)
 	if err != nil {
 		log.Println("Could not set key binding:", err)
 		return
@@ -323,33 +328,36 @@ func runGocui() {
 
 	// First, create the list view.
 	lv, err := g.SetView("list", 0, 0, lw, th-1)
-	if err != nil && err != gocui.ErrUnknownView {
+	if err != nil && err != c.ErrUnknownView {
 		log.Println("Failed to create main view:", err)
 		return
 	}
 	lv.Title = "List"
-	lv.FgColor = gocui.ColorCyan
+	lv.FgColor = c.ColorCyan
 
 	// Then the output view.
 	ov, err := g.SetView("output", lw+1, 0, tw-1, th-ih-1)
-	if err != nil && err != gocui.ErrUnknownView {
+	if err != nil && err != c.ErrUnknownView {
 		log.Println("Failed to create output view:", err)
 		return
 	}
 	ov.Title = "Output"
-	ov.FgColor = gocui.ColorGreen
+	ov.FgColor = c.ColorGreen
 	// Let the view scroll if the output exceeds the visible area.
 	ov.Autoscroll = true
-	fmt.Fprintln(ov, "Press Ctrl-c to quit")
+	_, err = fmt.Fprintln(ov, "Press Ctrl-c to quit")
+	if err != nil {
+		log.Println("Failed to print into output view:", err)
+	}
 
 	// And finally the input view.
 	iv, err := g.SetView("input", lw+1, th-ih, tw-1, th-1)
-	if err != nil && err != gocui.ErrUnknownView {
+	if err != nil && err != c.ErrUnknownView {
 		log.Println("Failed to create input view:", err)
 		return
 	}
 	iv.Title = "Input"
-	iv.FgColor = gocui.ColorYellow
+	iv.FgColor = c.ColorYellow
 	// The input view shall be editable.
 	iv.Editable = true
 	err = iv.SetCursor(0, 0)
@@ -359,28 +367,34 @@ func runGocui() {
 	}
 
 	// Make the enter key copy the input to the output.
-	g.SetKeybinding("input", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, iv *gocui.View) error {
+	err = g.SetKeybinding("input", c.KeyEnter, c.ModNone, func(g *c.Gui, iv *c.View) error {
 		// We want to read the view's buffer from the beginning.
 		iv.Rewind()
 
 		// Get the output view via its name.
-		ov, err := g.View("output")
-		if err != nil {
-			log.Println("Cannot get output view:", err)
-			return err
+		ov, e := g.View("output")
+		if e != nil {
+			log.Println("Cannot get output view:", e)
+			return e
 		}
 		// Thanks to views being an io.Writer, we can simply Fprint to a view.
-		fmt.Fprint(ov, iv.Buffer())
+		_, e = fmt.Fprint(ov, iv.Buffer())
+		if e != nil {
+			log.Println("Cannot print to output view:", e)
+		}
 		// Clear the input view
 		iv.Clear()
 		// Put the cursor back to the start.
-		err = iv.SetCursor(0, 0)
-		if err != nil {
-			log.Println("Failed to set cursor:", err)
+		e = iv.SetCursor(0, 0)
+		if e != nil {
+			log.Println("Failed to set cursor:", e)
 		}
-		return err
+		return e
 
 	})
+	if err != nil {
+		log.Println("Cannot bind the enter key:", err)
+	}
 
 	// Fill the list view.
 	for _, s := range listItems {
@@ -393,7 +407,10 @@ func runGocui() {
 	}
 
 	// Set the focus to the input view.
-	g.SetCurrentView("input")
+	_, err = g.SetCurrentView("input")
+	if err != nil {
+		log.Println("Cannot set focus to input view:", err)
+	}
 
 	// Start the main loop.
 	err = g.MainLoop()
@@ -402,7 +419,7 @@ func runGocui() {
 
 // The layout handler calculates all sizes depending
 // on the current terminal size.
-func layout(g *gocui.Gui) error {
+func layout(g *c.Gui) error {
 	// Get the current terminal size.
 	tw, th := g.Size()
 
@@ -424,8 +441,8 @@ func layout(g *gocui.Gui) error {
 
 // `quit` is a handler that gets bound to Ctrl-C.
 // It signals the main loop to exit.
-func quit(g *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
+func quit(g *c.Gui, v *c.View) error {
+	return c.ErrQuit
 }
 
 /*
