@@ -23,8 +23,8 @@ title = ""
 description = ""
 author = "Christoph Berger"
 email = "chris@appliedgo.net"
-date = "2017-03-28"
-publishdate = "2017-03-28"
+date = "2017-03-30"
+publishdate = "2017-03-30"
 draft = "true"
 domains = ["User Interface"]
 tags = ["TUI", "Console", "Terminal", "UI"]
@@ -154,7 +154,7 @@ This is maybe an edge case. `termloop` is a very specialized TUI - it is a game 
 ![termloop screenshot](termloop.png)
 
 
-## The code
+## Code
 
 As always, there is some code included to try out at your end. This time, the code uses the two libraries "termui" and "gocui" for creating a minimal UI with a simple layout:
 
@@ -165,19 +165,19 @@ As always, there is some code included to try out at your end. This time, the co
 If the libary provides a text entry widget, text entered there shall appear in the output pane.
 */
 
-// ## Imports and globals
-//
-// Importing two UI libraries at the same time is probably not a good idea, as
-// each has its own event loop. This demo code takes care of using only one
-// of these libraries at a time.
+// Imports and globals
 package main
 
+// Under normal circumstances, importing two UI libraries at the
+// same time is probably not a good idea, as each has its own event
+// loop. This demo code takes care of using only one of these
+// libraries at a time.
 import (
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/gizak/termui"
+	ui "github.com/gizak/termui"
 	"github.com/jroimartin/gocui"
 	"github.com/pkg/errors"
 )
@@ -203,82 +203,83 @@ var listItems = []string{
 
 Let's start with `termui`.
 
+`termui` organizes its content as "blocks". Blocks can be positioned using absolute coordinates, or they can be integrated into a 12-column grid layout. The grid layout allows to dynamically adjust the contents when the user resizes the terminal window.
+
 */
 
 //
 func runTermui() {
 	// Initialize termui.
-	err := termui.Init()
+	err := ui.Init()
 	if err != nil {
 		log.Fatalln("Cannot initialize termui")
 	}
 	// termui needs some cleanup when terminating.
-	defer termui.Close()
+	defer ui.Close()
 
-	// Get width and height of the terminal.
-	//tw := termui.TermWidth()
-	th := termui.TermHeight()
+	// Get the height of the terminal.
+	th := ui.TermHeight()
 
-	// The list pane
-	lp := termui.NewList()
-	lp.Height = th
-	lp.BorderLabel = "List"
-	lp.BorderLabelFg = termui.ColorGreen
-	lp.BorderFg = termui.ColorGreen
-	lp.ItemFgColor = termui.ColorWhite
-	lp.Items = listItems
+	// The list block
+	lb := ui.NewList()
+	lb.Height = th
+	lb.BorderLabel = "List"
+	lb.BorderLabelFg = ui.ColorGreen
+	lb.BorderFg = ui.ColorGreen
+	lb.ItemFgColor = ui.ColorWhite
+	lb.Items = listItems
 
-	// The input pane. termui has no edit box yet, but at the time of
+	// The input block. termui has no edit box yet, but at the time of
 	// this writing, there is an open pull request for adding
 	// a text input widget.
-	ip := termui.NewPar("")
-	ip.Height = ih
-	ip.BorderLabel = "Input"
-	ip.BorderLabelFg = termui.ColorYellow
-	ip.BorderFg = termui.ColorYellow
-	ip.TextFgColor = termui.ColorWhite
+	ib := ui.NewPar("")
+	ib.Height = ih
+	ib.BorderLabel = "Input"
+	ib.BorderLabelFg = ui.ColorYellow
+	ib.BorderFg = ui.ColorYellow
+	ib.TextFgColor = ui.ColorWhite
 
-	// The Output pane
-	op := termui.NewPar("\nPress Ctrl-C to quit")
-	op.Height = th - ih
-	op.BorderLabel = "Output"
-	op.BorderLabelFg = termui.ColorCyan
-	op.BorderFg = termui.ColorCyan
-	op.TextFgColor = termui.ColorWhite
+	// The Output block
+	ob := ui.NewPar("\nPress Ctrl-C to quit")
+	ob.Height = th - ih
+	ob.BorderLabel = "Output"
+	ob.BorderLabelFg = ui.ColorCyan
+	ob.BorderFg = ui.ColorCyan
+	ob.TextFgColor = ui.ColorWhite
 
-	// Now we need to create the layout. The panes have gotten a size
+	// Now we need to create the layout. The blocks have gotten a size
 	// but no position. A grid layout puts everything into place.
-	// termui.Body is a pre-defined grid. We add one row that contains
+	// ui.Body is a pre-defined grid. We add one row that contains
 	// two columns.
 	// The grid uses a 12-column system, so we have to give a "span"
-	termui.Body.AddRows(
-		termui.NewRow(
-			termui.NewCol(3, 0, lp),
-			termui.NewCol(9, 0, op, ip)))
+	ui.Body.AddRows(
+		ui.NewRow(
+			ui.NewCol(3, 0, lb),
+			ui.NewCol(9, 0, ob, ib)))
 
 	// Render the grid.
-	termui.Body.Align()
-	termui.Render(termui.Body)
+	ui.Body.Align()
+	ui.Render(ui.Body)
 
 	// When the window resizes, the grid must adopt to the new size.
 	// We use a hander func for this.
-	termui.Handle("/sys/wnd/resize", func(termui.Event) {
-		termui.Body.Align()
-		termui.Render(termui.Body)
+	ui.Handle("/sys/wnd/resize", func(ui.Event) {
+		ui.Body.Align()
+		ui.Render(ui.Body)
 	})
 	// We need a way out. Ctrl-C shall stop the event loop.
-	termui.Handle("/sys/kbd/C-c", func(termui.Event) {
-		termui.StopLoop()
+	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
+		ui.StopLoop()
 	})
 
 	// start the event loop.
-	termui.Loop()
+	ui.Loop()
 }
 
 /*
 That wasn't too difficult, was it? Text entry is missing here, as `termui`
 has no input controls yet. Still, implementing an input box is possible with
-the available API methods; see the `_example` subdirectory in `termui`'s repository.
+the available API methods; see the `_example` subdirectory in `termui`'s repository. It is just too much code for this blog article, so I leave this as an exercise to the reader.
 
 ## gocui
 
@@ -317,10 +318,10 @@ func runGocui() {
 
 	// Now let's define the views.
 
-	// First, some dimensions.
+	// The terminal's width and height are needed for layout calculations.
 	tw, th := g.Size()
 
-	// First, the list view.
+	// First, create the list view.
 	lv, err := g.SetView("list", 0, 0, lw, th-1)
 	if err != nil && err != gocui.ErrUnknownView {
 		log.Println("Failed to create main view:", err)
@@ -339,6 +340,7 @@ func runGocui() {
 	ov.FgColor = gocui.ColorGreen
 	// Let the view scroll if the output exceeds the visible area.
 	ov.Autoscroll = true
+	fmt.Fprintln(ov, "Press Ctrl-c to quit")
 
 	// And finally the input view.
 	iv, err := g.SetView("input", lw+1, th-ih, tw-1, th-1)
@@ -348,7 +350,7 @@ func runGocui() {
 	}
 	iv.Title = "Input"
 	iv.FgColor = gocui.ColorYellow
-	// The input view is editable.
+	// The input view shall be editable.
 	iv.Editable = true
 	err = iv.SetCursor(0, 0)
 	if err != nil {
@@ -358,6 +360,7 @@ func runGocui() {
 
 	// Make the enter key copy the input to the output.
 	g.SetKeybinding("input", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, iv *gocui.View) error {
+		// We want to read the view's buffer from the beginning.
 		iv.Rewind()
 
 		// Get the output view via its name.
@@ -366,8 +369,11 @@ func runGocui() {
 			log.Println("Cannot get output view:", err)
 			return err
 		}
+		// Thanks to views being an io.Writer, we can simply Fprint to a view.
 		fmt.Fprint(ov, iv.Buffer())
+		// Clear the input view
 		iv.Clear()
+		// Put the cursor back to the start.
 		err = iv.SetCursor(0, 0)
 		if err != nil {
 			log.Println("Failed to set cursor:", err)
@@ -378,6 +384,7 @@ func runGocui() {
 
 	// Fill the list view.
 	for _, s := range listItems {
+		// Again, we can simply Fprint to a view.
 		_, err = fmt.Fprintln(lv, s)
 		if err != nil {
 			log.Println("Error writing to the list view:", err)
@@ -444,6 +451,16 @@ func main() {
 }
 
 /*
+## Conclusion
+
+Both libraries have their pros and cons. The `termui` code seems more concise, but this might be due to the lack of an editing feature (that would have added some lines of code), and perhaps also due to the grid layout engine that made the resize handler a two-liner.
+
+The `gocui` layout is certainly more flexible but the tradeoff is increased code size. Text input only needs a few lines of code in `gocui`, whereas data visualization is where `termui` shines.
+
+I leave the decision to you; maybe you even perfer to go low-level with `termbox` or `tcell`, or you might decide to give the other TUI libs a try.
+
+The bottom line is,
+
 ## How to get and run the code
 
 Step 1: `go get` the code. Note the `-d` flag that prevents auto-installing
