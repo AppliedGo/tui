@@ -19,40 +19,40 @@ Comments and code in this file are used for describing and explaining a particul
 -->
 
 +++
-title = ""
-description = ""
+title = "Text-Based User Interfaces"
+description = "Beef up your Go console application with a Text-Based UI"
 author = "Christoph Berger"
 email = "chris@appliedgo.net"
-date = "2017-03-30"
-publishdate = "2017-03-30"
-draft = "true"
+date = "2017-04-02"
+publishdate = "2017-04-02"
+draft = "false"
 domains = ["User Interface"]
 tags = ["TUI", "Console", "Terminal", "UI"]
-categories = [""]
+categories = ["Tools and Libraries"]
 +++
 
-Want to equip your terminal application with a nice visual user interface? TUI libraries are here to help.
+Want to equip your command-line application with a nice visual user interface? TUI libraries are here to help.
 
 <!--more-->
 
 Console applications usually take some parameters at start, and maybe some more input through basic console I/O. And that's ok in most cases, though sometimes it would be great to have a visual user interface but without the code size and complexity of a full-blown Web app.
 
-[Text-Based User Interface](https://en.wikipedia.org/wiki/Text-based_user_interface libraries (or TUI libraries) meet this need. They bring panes, input, output, mouse support, graphics, and audio, to your terminal.
+[Text-Based User Interface](https://en.wikipedia.org/wiki/Text-based_user_interface) libraries (or TUI libraries) meet this need. They bring panes, input, output, mouse support, graphics, and audio, to your terminal.
 
 
 ## OK, so can we do a side-by-side test, please?
 
-TL;DR: Unfortunately, no.
+Unfortunately, no.
 
 Originally, I planned to evaluate three to four TUI libraries for Go side-by-side, using a sample app definition with a specific set of features to be tested. I had a few requirements on the libraries: They should -
 
-* be fairly complete TUI libraries (as opposed to say, just drawing a progress bar and nothing else),
-* provide high-level abstractions,
-* be active projects (that is, the last commit should not date back to months ago),
+* be fairly complete TUI libraries, supporting flexible layouts, standard UI widgets like buttons, menus, text entry, text output, mouse support, etc.
+* provide high-level abstractions (as opposed to only providing low-level UI primitives),
+* be active projects (that is, the last commit should not date back to months or even years ago),
 * be past the alpha stage, and
 * have reasonable documentation or sample code. (No, API docs don't count. I wanted at least a simple how-to-start tutorial that covers the basics.)
 
-Turned out that none of the libraries passed all requirements.
+Turned out that none of the libraries I found passes all of the requirements.
 
 
 ## So that's it? No single all-in-one, high-level GUI lib with decent documentation?
@@ -83,19 +83,27 @@ As simple as the API might seem, it has not prevented others from creating inter
 
 The README makes no claims about supported platforms. The code includes some `syscall_*.go` files, indicating that `termbox-go` runs on Linux, macOS, Windows, OpenBSD, NetBSD, FreeBSD, and Dragonfly BSD.
 
-`termbox` requires `cgo` for doing low-level calls to system libraries.
+
+##### Strengths
+
+* A fair range of supported platforms
+* Popular base TUI layer for a number of TUI projects
 
 
 #### [gdamore/tcell](https://github.com/gdamore/tcell)
 
-According to the author, `tcell` was born out of the need for certain features that `termbox-go` does not provide, and patching `termbox-go` turned out to not be a suitable way to go forward. `tcell` claims to have a couple of advantages over `termbox-go`, including [added functionality](https://godoc.org/github.com/gdamore/tcell), better portability, better support for mouse, Unicode, colors, and more. (I cannot comment on these claims, as I have tested neither `termbox` nor `tcell` in great depth.)
-Tcell is the TUI library behind the [Micro editor](https://github.com/zyedidia/micro/), and is also used by [godu](https://github.com/viktomas/godu).
+According to the author, `tcell` was born out of the need for certain features that `termbox-go` does not provide, and patching `termbox-go` turned out to not be a suitable way to go forward. `tcell` claims to have a couple of advantages over `termbox-go`, including [additional functionality](https://godoc.org/github.com/gdamore/tcell), better portability, better I/O, better support for mouse, Unicode, colors, and more. (I cannot comment on these claims, as I have tested neither `termbox` nor `tcell` in great depth.)
+`tcell` is the TUI library behind the [Micro editor](https://github.com/zyedidia/micro/), and is also used by [godu](https://github.com/viktomas/godu).
 
 According to the README, `tcell` works on POSIX systems that provide a POSIX termios implementation with `/dev/tty`, as well as on Windows.
 
 The "POSIX" requirement includes Linux, macOS, FreeBSD, and Solaris, and certainly more systems that are not explicitly listed in the README.
 
-Like `termbox`, `tcell` also requires `cgo`.
+
+##### Strengths
+
+* A wide range of suppored platforms
+* A rich API
 
 
 ### Higher-level libraries
@@ -115,12 +123,22 @@ What is missing from `termui` to make it a "feature-complete" TUI toolkit is hig
 
 A couple of projects have already been built with `termui`, including [ctop](https://github.com/bcicen/ctop).
 
+##### Strengths
+
+* Rich set of data visualization widgets
+* Flexible, resizable 12-column grid layout
+
 
 #### [jroimartin/gocui](https://github.com/jroimartin/gocui)
 
 This library almost seems like the opposite of `termui`: No fancy widgets anywhere, but instead, building blocks for split views, overlapping views, editable views, and event handling for keyboard and mouse events.
 
 ![gocui real-life screenshot - httplab](httplab.gif)
+
+##### Strengths
+
+* Text input views
+* Resizable layouts via custom redraw handler
 
 
 ### Promising projects
@@ -130,9 +148,15 @@ I couldn't resist including the following projects here, although they do not me
 
 #### [VladimirMarkelov/clui](https://github.com/VladimirMarkelov/clui)
 
-From the screenshots, this is perhaps the best-looking TUI library in this list. It also looks fairly advanced already (featuring a rich set of UI widgets like buttons, drop-down lists, gauges, etc. as well as a window manager and theming), however, the lack of documentation (except the API docs) indicates that this is still a work in progress.
+From the screenshots, this is perhaps the best-looking TUI library in this list. It also looks fairly advanced already, featuring a rich set of UI widgets like buttons, drop-down lists, gauges, etc. as well as a window manage and theming. However, the lack of documentation (except for the API docs) indicates that this is still a work in progress.
 
 ![clui screencast](clui.gif)
+
+
+##### Strengths
+
+* Many standard UI widget
+* Multi window capability, including resizing and overlapping
 
 
 #### [cznic/wm](https://github.com/cznic/wm)
@@ -141,22 +165,39 @@ Definitely a work in progress, `wm` manages overlapping, resizeable, decorated w
 
 ![wm screenshot](tk.png)
 
+##### Strengths
+
+* Multiple, overlapping windows
+
 
 #### [marcusolsson/tui-go](https://github.com/marcusolsson/tui-go)
 
 The building blocks of `tui-go` are widgets and layout boxes. There seems no support for mouse-based resizing of layout boxes, but each layout box can assume one of (currently) two automatic resizing behaviors.
 
+![tui-go screenshot](tui-go.png)
+
+
+##### Strengths
+
+* Easy layout through horizontally and vertically stacked layout boxes
+* Layout automatically adjusts to changed terminal size
+* Text input boxes
+
 
 #### [termloop](https://github.com/JoelOtter/termloop)
 
-This is maybe an edge case. `termloop` is a very specialized TUI - it is a game toolkit for the terminal. So perhaps you won't be able to build a "standard" application UI on top of it, but you surely can make your window rectangles make a sound when colliding! 😉
+This one is a special kind of TUI. `termloop` is not a general TUI library. Rather, it is a specialized toolkit for console-based games. So perhaps you won't be able to build a "standard" application UI on top of it, but you surely can make your windows make a sound when colliding! 😉
 
 ![termloop screenshot](termloop.png)
+
+##### Strengths
+
+* Support for console games
 
 
 ## Code
 
-As always, there is some code included to try out at your end. This time, the code uses the two libraries "termui" and "gocui" for creating a minimal UI with a simple layout:
+As always, there is some code included to try out at your end. This time, the code uses the two libraries `termui` and `gocui` for creating a minimal UI with a simple layout - similar to the layout in the `tui-go` screenshot:
 
 * A list box with a fixed width, positioned at the left side
 * A text entry box with a fixed height, positioned at the bottom
@@ -481,7 +522,7 @@ func main() {
 }
 
 /*
-## Conclusion
+## Conclusions from the code
 
 Both libraries have their pros and cons. The `termui` code seems more concise, but this might be due to the lack of an editing feature (that would have added some lines of code), and perhaps also due to the grid layout engine that made the resize handler a two-liner.
 
@@ -489,7 +530,6 @@ The `gocui` layout is certainly more flexible but the tradeoff is increased code
 
 I leave the decision to you; maybe you even perfer to go low-level with `termbox` or `tcell`, or you might decide to give the other TUI libs a try.
 
-The bottom line is,
 
 ## How to get and run the code
 
@@ -502,16 +542,10 @@ Step 2: `cd` to the source code directory.
 
     cd $GOPATH/src/github.com/appliedgo/tui
 
-Step 3. Run the binary.
+Step 3. Run the binary with either "termui" or "gocui" as a parameter.
 
     go run tui.go termui
     go run tui.go gocui
-
-
-## Odds and ends
-## Some remarks
-## Tips
-## Links
 
 
 **Happy coding!**
