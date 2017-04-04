@@ -126,7 +126,7 @@ A couple of projects have already been built with `termui`, including [ctop](htt
 ##### Strengths
 
 * Rich set of data visualization widgets
-* Flexible, resizable 12-column grid layout
+* Flexible, resizeable 12-column grid layout
 
 
 #### [jroimartin/gocui](https://github.com/jroimartin/gocui)
@@ -138,7 +138,7 @@ This library almost seems like the opposite of `termui`: No fancy widgets anywhe
 ##### Strengths
 
 * Text input views
-* Resizable layouts via custom redraw handler
+* Resizeable layouts via custom redraw handler
 
 
 ### Promising projects
@@ -155,7 +155,7 @@ From the screenshots, this is perhaps the best-looking TUI library in this list.
 
 ##### Strengths
 
-* Many standard UI widget
+* Many standard UI widgets
 * Multi window capability, including resizing and overlapping
 
 
@@ -203,7 +203,7 @@ As always, there is some code included to try out at your end. This time, the co
 * A text entry box with a fixed height, positioned at the bottom
 * A general-purpose output pane in the remaining area
 
-If the libary provides a text entry widget, text entered there shall appear in the output pane.
+If the library provides a text entry widget, text entered there shall appear in the output pane.
 */
 
 // Imports and globals
