@@ -528,7 +528,7 @@ Both libraries have their pros and cons. The `termui` code seems more concise, b
 
 The `gocui` layout is certainly more flexible but the tradeoff is increased code size. Text input only needs a few lines of code in `gocui`, whereas data visualization is where `termui` shines.
 
-I leave the decision to you; maybe you even perfer to go low-level with `termbox` or `tcell`, or you might decide to give the other TUI libs a try.
+I leave the decision to you; maybe you even prefer to go low-level with `termbox` or `tcell`, or you might decide to give the other TUI libs a try.
 
 
 ## How to get and run the code
