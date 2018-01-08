@@ -195,6 +195,29 @@ This one is a special kind of TUI. `termloop` is not a general TUI library. Rath
 * Support for console games
 
 
+**Update 2018-01-08**
+
+#### [rivo/tview](https://github.com/rivo/tview)
+
+A newcomer in 2018. In order avoid having to always write UI controls from scratch, the author decided to create a package choke-full of high-level interactive controls like:
+
+* Input forms
+* Text views (multi-colored and navigable)
+* Tables and lists (navigable and selectable)
+* Layout managers (flex and pages)
+* and more.
+
+`tview` is based on `gdamore/tcell`.
+
+##### Strengths
+
+* All-in-one solution, including a comprehensive set of controls (from simple input field to complex table control), support for automatic layout, and an application wrapper.
+* Powerful controls
+* Intuitive API with optional support for dot-chaining of method calls (if you really want to)
+* Detailed documentation with sample code, via [godoc.org API doc](https://godoc.org/github.com/rivo/tview) and [GitHub Wiki](https://github.com/rivo/tview/wiki).
+
+
+
 ## Code
 
 As always, there is some code included to try out at your end. This time, the code uses the two libraries `termui` and `gocui` for creating a minimal UI with a simple layout - similar to the layout in the `tui-go` screenshot:
@@ -549,5 +572,12 @@ Step 3. Run the binary with either "termui" or "gocui" as a parameter.
 
 
 **Happy coding!**
+
+
+- - -
+
+Changelog:
+
+2018-01-08: Added `rivo/tview`
 
 */
