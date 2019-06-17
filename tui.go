@@ -26,9 +26,9 @@ email = "chris@appliedgo.net"
 date = "2017-04-02"
 publishdate = "2017-04-02"
 draft = "false"
-domains = ["User Interface"]
+categories = ["User Interface"]
 tags = ["TUI", "Console", "Terminal", "UI"]
-categories = ["Tools and Libraries"]
+articletypes = ["Tools and Libraries"]
 +++
 
 Want to equip your command-line application with a nice visual user interface? TUI libraries are here to help.
